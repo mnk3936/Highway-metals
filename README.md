@@ -1,6 +1,4 @@
-Here's a complete README.md file with PostgreSQL setup included:
 
-```markdown
 # 🏭 MetalWorks Price Management System
 
 A smart, automated pricing system for metal distributors and manufacturers. Automatically updates product prices when raw material costs change using a proportional pricing algorithm.
@@ -871,21 +869,3 @@ If you find this project useful, please consider giving it a star on GitHub!
 ---
 
 **Built with ❤️ using Flask and Python**
-```
-
-This README includes:
-- Complete PostgreSQL setup instructions for Windows, Linux, and Mac
-- SQLite setup as an alternative
-- Troubleshooting for PostgreSQL-specific issues
-- Database backup and restore procedures
-- Security best practices
-- Production deployment guidelines
-- Clear formatting and navigation
-
-Save this as `README.md` in your project root directory![1][2][3][4][5]
-
-[1](https://flask-migrate.readthedocs.io)
-[2](https://neon.com/postgresql/postgresql-administration/restart-postgresql-windows)
-[3](https://www.postgresql.org/docs/current/app-createdb.html)
-[4](https://www.postgresql.org/docs/current/sql-createdatabase.html)
-[5](https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database)

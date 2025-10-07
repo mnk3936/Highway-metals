@@ -3,142 +3,519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Raw Material Pricing</title>
+    <title>Admin Panel - HIGHWAY METALS</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .login-section { background: #f0f0f0; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .hidden { display: none; }
-        .section { margin-bottom: 40px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #4CAF50; color: white; }
-        input, select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; margin: 5px; }
-        button:hover { background-color: #45a049; }
-        button.delete { background-color: #f44336; }
-        button.delete:hover { background-color: #da190b; }
-        .success { color: green; padding: 10px; }
-        .error { color: red; padding: 10px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 10px 20px; background: #ddd; cursor: pointer; border-radius: 4px; }
-        .tab.active { background: #4CAF50; color: white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #f0f0f0;
+        }
+        
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-logout:hover {
+            background: #c82333;
+        }
+        
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Login Section */
+        .login-section { 
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .login-section h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-login {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .btn-login:hover {
+            background: #5568d3;
+        }
+        
+        .hidden { 
+            display: none; 
+        }
+        
+        /* Admin Panel Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: #666;
+        }
+        
+        /* Tabs */
+        .tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab { 
+            padding: 12px 30px;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .tab:hover {
+            background: #e0e0e0;
+        }
+        
+        .tab.active { 
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Section Styling */
+        .section { 
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        /* Form Styling */
+        form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        form input, form select {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        form input:focus, form select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        form button { 
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 5px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        form button:hover { 
+            background: #5568d3;
+        }
+        
+        /* Table Styling */
+        table { 
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        
+        th, td { 
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        th { 
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        td input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+        
+        /* Button Styling */
+        button.update { 
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 2px;
+            font-size: 13px;
+        }
+        
+        button.update:hover { 
+            background: #218838;
+        }
+        
+        button.delete { 
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 2px;
+            font-size: 13px;
+        }
+        
+        button.delete:hover { 
+            background: #c82333;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-section label {
+            margin-right: 10px;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .filter-section select {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .success { 
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error { 
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/" class="logo">🏭 HIGHWAY METALS</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/products">Product Catalog</a>
+            <span class="user-info" id="userInfo"></span>
+            <button class="btn-logout" id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
     <!-- Login Section -->
     <div id="loginSection" class="login-section">
-        <h2>Admin Login</h2>
+        <h2>🔐 Admin Login</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">Please login to access the admin panel</p>
+        <div class="message hidden" id="loginMessage"></div>
         <form id="loginForm">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Login</button>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn-login">Login to Admin Panel</button>
         </form>
-        <p id="loginMessage"></p>
+        <p style="text-align: center; margin-top: 20px; color: #999; font-size: 13px;">
+            Default credentials: admin / admin123
+        </p>
     </div>
 
-    <!-- Admin Panel -->
+    <!-- Admin Panel (hidden until logged in) -->
     <div id="adminPanel" class="hidden">
-        <h1>Admin Panel</h1>
-        <button onclick="logout()" style="float: right;">Logout</button>
-        <div style="clear: both;"></div>
-        
-        <div id="message"></div>
-        
-        <!-- Tabs -->
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('materials')">Raw Materials</div>
-            <div class="tab" onclick="showTab('products')">Products</div>
-        </div>
-        
-        <!-- Raw Materials Section -->
-        <div id="materialsSection" class="section">
-            <h2>Add New Raw Material</h2>
-            <form id="addMaterialForm">
-                <input type="text" id="materialName" placeholder="Material Name" required>
-                <input type="number" id="materialPrice" step="0.01" placeholder="Price" required>
-                <button type="submit">Add Material</button>
-            </form>
-            
-            <h2>Current Raw Materials</h2>
-            <table id="materialsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Current Price</th>
-                        <th>Last Updated</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-        
-        <!-- Products Section -->
-        <div id="productsSection" class="section hidden">
-            <h2>Add New Product</h2>
-            <form id="addProductForm">
-                <input type="text" id="productName" placeholder="Product Name" required>
-                
-                <select id="productMaterial" required>
-                    <option value="">Select Raw Material</option>
-                </select>
-                
-                <input type="number" id="productBasePrice" step="0.01" placeholder="Base Price" required>
-                
-                <input type="number" id="productCoefficient" step="0.1" placeholder="Coefficient (0-1)" min="0" max="1" value="1.0" required>
-                
-                <select id="productCategory" required>
-                    <option value="">Select Category</option>
-                    <option value="Pipes">Pipes</option>
-                    <option value="Sheets">Sheets</option>
-                    <option value="Bars">Bars</option>
-                    <option value="Wires">Wires</option>
-                    <option value="Coils">Coils</option>
-                    <option value="Plates">Plates</option>
-                    <option value="Tubes">Tubes</option>
-                    <option value="Angles">Angles</option>
-                    <option value="Channels">Channels</option>
-                    <option value="Beams">Beams</option>
-                    <option value="Other">Other</option>
-                </select>
-                
-                <button type="submit">Add Product</button>
-            </form>
-            
-            <h2>Current Products</h2>
-            <div style="margin-bottom: 10px;">
-                <label>Filter by Category: </label>
-                <select id="filterCategory" onchange="filterProducts()">
-                    <option value="">All Categories</option>
-                    <option value="Pipes">Pipes</option>
-                    <option value="Sheets">Sheets</option>
-                    <option value="Bars">Bars</option>
-                    <option value="Wires">Wires</option>
-                    <option value="Coils">Coils</option>
-                    <option value="Plates">Plates</option>
-                    <option value="Tubes">Tubes</option>
-                    <option value="Angles">Angles</option>
-                    <option value="Channels">Channels</option>
-                    <option value="Beams">Beams</option>
-                    <option value="Other">Other</option>
-                </select>
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>⚙️ Admin Panel</h1>
+                <p>Manage raw materials and products. Price updates automatically cascade to all linked products.</p>
             </div>
-            <table id="productsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Raw Material</th>
-                        <th>Base Price</th>
-                        <th>Coefficient</th>
-                        <th>Current Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+
+            <!-- Message Display Area -->
+            <div id="message" class="message hidden"></div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('materials')">Raw Materials</div>
+                <div class="tab" onclick="showTab('products')">Products</div>
+            </div>
+            
+            <!-- Raw Materials Section -->
+            <div id="materialsSection" class="section">
+                <h2>📦 Raw Materials Management</h2>
+                
+                <form id="addMaterialForm">
+                    <h3 style="margin-bottom: 15px; color: #666;">Add New Raw Material</h3>
+                    <input type="text" id="materialName" placeholder="Material Name (e.g., Steel, Copper)" required>
+                    <input type="number" id="materialPrice" step="0.01" placeholder="Current Price ($/unit)" required>
+                    <button type="submit">➕ Add Material</button>
+                </form>
+                
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #666;">Current Raw Materials</h3>
+                <div id="materialsTableContainer">
+                    <table id="materialsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Material Name</th>
+                                <th>Current Price ($)</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Products Section -->
+            <div id="productsSection" class="section hidden">
+                <h2>🏗️ Products Management</h2>
+                
+                <form id="addProductForm">
+                    <h3 style="margin-bottom: 15px; color: #666;">Add New Product</h3>
+                    
+                    <input type="text" id="productName" placeholder="Product Name (e.g., Steel Pipe 2 inch)" required>
+                    
+                    <select id="productMaterial" required>
+                        <option value="">Select Raw Material</option>
+                    </select>
+                    
+                    <input type="number" id="productBasePrice" step="0.01" placeholder="Base Price ($)" required>
+                    
+                    <input type="number" id="productCoefficient" step="0.01" placeholder="Coefficient (0-1)" min="0" max="1" value="1.0" required>
+                    
+                    <select id="productCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Pipes">Pipes</option>
+                        <option value="Sheets">Sheets</option>
+                        <option value="Bars">Bars</option>
+                        <option value="Rods">Rods</option>
+                        <option value="Wires">Wires</option>
+                        <option value="Coils">Coils</option>
+                        <option value="Plates">Plates</option>
+                        <option value="Tubes">Tubes</option>
+                        <option value="Angles">Angles</option>
+                        <option value="Channels">Channels</option>
+                        <option value="Beams">Beams</option>
+                        <option value="Fasteners">Fasteners</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    
+                    <button type="submit">➕ Add Product</button>
+                </form>
+                
+                <div class="filter-section">
+                    <label for="filterCategory">🔍 Filter by Category:</label>
+                    <select id="filterCategory" onchange="filterProducts()">
+                        <option value="">All Categories</option>
+                        <option value="Pipes">Pipes</option>
+                        <option value="Sheets">Sheets</option>
+                        <option value="Bars">Bars</option>
+                        <option value="Rods">Rods</option>
+                        <option value="Wires">Wires</option>
+                        <option value="Coils">Coils</option>
+                        <option value="Plates">Plates</option>
+                        <option value="Tubes">Tubes</option>
+                        <option value="Angles">Angles</option>
+                        <option value="Channels">Channels</option>
+                        <option value="Beams">Beams</option>
+                        <option value="Fasteners">Fasteners</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <h3 style="margin-top: 20px; margin-bottom: 15px; color: #666;">Current Products</h3>
+                <div id="productsTableContainer">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Raw Material</th>
+                                <th>Base Price ($)</th>
+                                <th>Coefficient</th>
+                                <th>Current Price ($)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -154,6 +531,7 @@
         
         // Tab switching
         function showTab(tab) {
+            // Update tab active state
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             
@@ -169,11 +547,35 @@
             }
         }
         
+        // Check if user is logged in - UPDATED to use new endpoint
+        async function checkSession() {
+            try {
+                const response = await fetch(`${API_BASE}/check-session`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.logged_in && data.is_admin) {
+                        // User is logged in and is admin
+                        isLoggedIn = true;
+                        document.getElementById('loginSection').classList.add('hidden');
+                        document.getElementById('adminPanel').classList.remove('hidden');
+                        document.getElementById('userInfo').textContent = `Welcome, ${data.username}`;
+                        loadMaterials();
+                    }
+                }
+            } catch (error) {
+                console.log('Not logged in');
+            }
+        }
+        
         // Login functionality
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const messageEl = document.getElementById('loginMessage');
             
             try {
                 const response = await fetch(`${API_BASE}/login`, {
@@ -187,36 +589,29 @@
                 
                 if (response.ok) {
                     isLoggedIn = true;
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('adminPanel').classList.remove('hidden');
-                    loadMaterials();
+                    messageEl.textContent = '✓ Login successful! Loading admin panel...';
+                    messageEl.className = 'message success';
+                    messageEl.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        document.getElementById('loginSection').classList.add('hidden');
+                        document.getElementById('adminPanel').classList.remove('hidden');
+                        document.getElementById('userInfo').textContent = `Welcome, ${data.user.username}`;
+                        loadMaterials();
+                    }, 1000);
                 } else {
-                    document.getElementById('loginMessage').textContent = data.error || 'Login failed';
-                    document.getElementById('loginMessage').className = 'error';
+                    messageEl.textContent = '✗ ' + (data.error || 'Login failed');
+                    messageEl.className = 'message error';
+                    messageEl.classList.remove('hidden');
                 }
             } catch (error) {
-                document.getElementById('loginMessage').textContent = 'Error: ' + error.message;
-                document.getElementById('loginMessage').className = 'error';
+                messageEl.textContent = '✗ Error: ' + error.message;
+                messageEl.className = 'message error';
+                messageEl.classList.remove('hidden');
             }
         });
         
-        async function checkSession() {
-            try {
-                const response = await fetch(`${API_BASE}/raw-materials`, {
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    isLoggedIn = true;
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('adminPanel').classList.remove('hidden');
-                    loadMaterials();
-                }
-            } catch (error) {
-                console.log('Not logged in');
-            }
-        }
-        
+        // Logout
         async function logout() {
             const response = await fetch(`${API_BASE}/logout`, {
                 method: 'POST',
@@ -224,9 +619,7 @@
             });
             
             if (response.ok) {
-                isLoggedIn = false;
-                document.getElementById('adminPanel').classList.add('hidden');
-                document.getElementById('loginSection').classList.remove('hidden');
+                window.location.href = '/';
             }
         }
         
@@ -243,66 +636,93 @@
             allMaterials.forEach(material => {
                 const option = document.createElement('option');
                 option.value = material.id;
-                option.textContent = `${material.name} - $${material.current_price}`;
+                option.textContent = `${material.name} - $${material.current_price.toFixed(2)}`;
                 select.appendChild(option);
             });
         }
         
         // Load all materials
         async function loadMaterials() {
-            const response = await fetch(`${API_BASE}/raw-materials`, {
-                credentials: 'include'
-            });
-            const materials = await response.json();
-            
-            const tbody = document.querySelector('#materialsTable tbody');
-            tbody.innerHTML = '';
-            
-            materials.forEach(material => {
-                const row = `
-                    <tr>
-                        <td>${material.id}</td>
-                        <td>${material.name}</td>
-                        <td>
-                            <input type="number" id="price-${material.id}" 
-                                   value="${material.current_price}" step="0.01">
-                        </td>
-                        <td>${new Date(material.last_updated).toLocaleString()}</td>
-                        <td>
-                            <button onclick="updatePrice(${material.id})">Update</button>
-                            <button class="delete" onclick="deleteMaterial(${material.id})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
+            try {
+                const response = await fetch(`${API_BASE}/raw-materials`, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load materials');
+                }
+                
+                const materials = await response.json();
+                const tbody = document.querySelector('#materialsTable tbody');
+                tbody.innerHTML = '';
+                
+                if (materials.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">No materials added yet. Add your first raw material above!</td></tr>';
+                    return;
+                }
+                
+                materials.forEach(material => {
+                    const row = `
+                        <tr>
+                            <td>${material.id}</td>
+                            <td><strong>${material.name}</strong></td>
+                            <td>
+                                <input type="number" id="price-${material.id}" 
+                                       value="${material.current_price}" step="0.01" min="0">
+                            </td>
+                            <td>${new Date(material.last_updated).toLocaleString()}</td>
+                            <td>
+                                <button class="update" onclick="updatePrice(${material.id})">💾 Update Price</button>
+                                <button class="delete" onclick="deleteMaterial(${material.id})">🗑️ Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                showMessage('Error loading materials: ' + error.message, 'error');
+            }
         }
         
         // Load all products
         async function loadProducts() {
-            const response = await fetch(`${API_BASE}/products`, {
-                credentials: 'include'
-            });
-            allProducts = await response.json();
-            displayProducts(allProducts);
+            try {
+                const response = await fetch(`${API_BASE}/products`, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load products');
+                }
+                
+                allProducts = await response.json();
+                displayProducts(allProducts);
+            } catch (error) {
+                showMessage('Error loading products: ' + error.message, 'error');
+            }
         }
         
         function displayProducts(products) {
             const tbody = document.querySelector('#productsTable tbody');
             tbody.innerHTML = '';
             
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #999;">No products added yet. Add your first product above!</td></tr>';
+                return;
+            }
+            
             products.forEach(product => {
                 const row = `
                     <tr>
                         <td>${product.id}</td>
-                        <td>${product.name}</td>
-                        <td>${product.category || 'N/A'}</td>
+                        <td><strong>${product.name}</strong></td>
+                        <td><span style="background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px;">${product.category || 'N/A'}</span></td>
                         <td>${product.raw_material_name}</td>
                         <td>$${product.base_price.toFixed(2)}</td>
                         <td>${product.coefficient}</td>
-                        <td>$${product.current_price.toFixed(2)}</td>
+                        <td><strong style="color: #28a745;">$${product.current_price.toFixed(2)}</strong></td>
                         <td>
-                            <button class="delete" onclick="deleteProduct(${product.id})">Delete</button>
+                            <button class="delete" onclick="deleteProduct(${product.id})">🗑️ Delete</button>
                         </td>
                     </tr>
                 `;
@@ -326,19 +746,24 @@
             const name = document.getElementById('materialName').value;
             const price = parseFloat(document.getElementById('materialPrice').value);
             
-            const response = await fetch(`${API_BASE}/raw-materials`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ name, current_price: price })
-            });
-            
-            if (response.ok) {
-                showMessage('Material added successfully', 'success');
-                loadMaterials();
-                e.target.reset();
-            } else {
-                showMessage('Error adding material', 'error');
+            try {
+                const response = await fetch(`${API_BASE}/raw-materials`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ name, current_price: price })
+                });
+                
+                if (response.ok) {
+                    showMessage(`✓ Material "${name}" added successfully!`, 'success');
+                    loadMaterials();
+                    e.target.reset();
+                } else {
+                    const error = await response.json();
+                    showMessage('✗ Error: ' + (error.error || 'Failed to add material'), 'error');
+                }
+            } catch (error) {
+                showMessage('✗ Error adding material: ' + error.message, 'error');
             }
         });
         
@@ -354,20 +779,24 @@
                 category: document.getElementById('productCategory').value
             };
             
-            const response = await fetch(`${API_BASE}/products`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(product)
-            });
-            
-            if (response.ok) {
-                showMessage('Product added successfully', 'success');
-                loadProducts();
-                e.target.reset();
-            } else {
-                const error = await response.json();
-                showMessage('Error adding product: ' + (error.error || 'Unknown error'), 'error');
+            try {
+                const response = await fetch(`${API_BASE}/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(product)
+                });
+                
+                if (response.ok) {
+                    showMessage(`✓ Product "${product.name}" added successfully!`, 'success');
+                    loadProducts();
+                    e.target.reset();
+                } else {
+                    const error = await response.json();
+                    showMessage('✗ Error: ' + (error.error || 'Failed to add product'), 'error');
+                }
+            } catch (error) {
+                showMessage('✗ Error adding product: ' + error.message, 'error');
             }
         });
         
@@ -375,61 +804,88 @@
         async function updatePrice(id) {
             const newPrice = parseFloat(document.getElementById(`price-${id}`).value);
             
-            const response = await fetch(`${API_BASE}/raw-materials/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ current_price: newPrice })
-            });
+            if (isNaN(newPrice) || newPrice < 0) {
+                showMessage('✗ Please enter a valid price', 'error');
+                return;
+            }
             
-            if (response.ok) {
-                const result = await response.json();
-                showMessage(`Price updated! ${result.updated_products.length} products affected`, 'success');
-                loadMaterials();
-            } else {
-                showMessage('Error updating price', 'error');
+            try {
+                const response = await fetch(`${API_BASE}/raw-materials/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ current_price: newPrice })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const affectedCount = result.updated_products ? result.updated_products.length : 0;
+                    showMessage(`✓ Price updated successfully! ${affectedCount} product(s) automatically recalculated.`, 'success');
+                    loadMaterials();
+                } else {
+                    showMessage('✗ Error updating price', 'error');
+                }
+            } catch (error) {
+                showMessage('✗ Error: ' + error.message, 'error');
             }
         }
         
         // Delete material
         async function deleteMaterial(id) {
-            if (!confirm('Are you sure you want to delete this material?')) return;
+            if (!confirm('⚠️ Are you sure you want to delete this material?\n\nWarning: This will fail if products are linked to it.')) return;
             
-            const response = await fetch(`${API_BASE}/raw-materials/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                showMessage('Material deleted', 'success');
-                loadMaterials();
-            } else {
-                showMessage('Error deleting material', 'error');
+            try {
+                const response = await fetch(`${API_BASE}/raw-materials/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    showMessage('✓ Material deleted successfully', 'success');
+                    loadMaterials();
+                } else {
+                    const error = await response.json();
+                    showMessage('✗ Error: ' + (error.error || 'Cannot delete material with linked products'), 'error');
+                }
+            } catch (error) {
+                showMessage('✗ Error deleting material: ' + error.message, 'error');
             }
         }
         
         // Delete product
         async function deleteProduct(id) {
-            if (!confirm('Are you sure you want to delete this product?')) return;
+            if (!confirm('⚠️ Are you sure you want to delete this product?')) return;
             
-            const response = await fetch(`${API_BASE}/products/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                showMessage('Product deleted', 'success');
-                loadProducts();
-            } else {
-                showMessage('Error deleting product', 'error');
+            try {
+                const response = await fetch(`${API_BASE}/products/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    showMessage('✓ Product deleted successfully', 'success');
+                    loadProducts();
+                } else {
+                    showMessage('✗ Error deleting product', 'error');
+                }
+            } catch (error) {
+                showMessage('✗ Error: ' + error.message, 'error');
             }
         }
         
         function showMessage(text, type) {
             const msg = document.getElementById('message');
             msg.textContent = text;
-            msg.className = type;
-            setTimeout(() => msg.textContent = '', 3000);
+            msg.className = `message ${type}`;
+            msg.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                msg.classList.add('hidden');
+            }, 5000);
+            
+            // Scroll to top to show message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>

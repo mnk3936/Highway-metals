@@ -41,3 +41,15 @@ def login():
 def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully'})
+# NEW: Add this endpoint to check current session
+@auth_bp.route('/api/check-session', methods=['GET'])
+def check_session():
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user:
+            return jsonify({
+                'logged_in': True,
+                'username': user.username,
+                'is_admin': user.is_admin
+            })
+    return jsonify({'logged_in': False}), 401

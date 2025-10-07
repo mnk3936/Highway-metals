@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Raw Material Pricing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .login-section { background: #f0f0f0; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .hidden { display: none; }
+        .section { margin-bottom: 40px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; margin: 5px; }
+        button:hover { background-color: #45a049; }
+        button.delete { background-color: #f44336; }
+        button.delete:hover { background-color: #da190b; }
+        .success { color: green; padding: 10px; }
+        .error { color: red; padding: 10px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #ddd; cursor: pointer; border-radius: 4px; }
+        .tab.active { background: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="login-section">
+        <h2>Admin Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="loginMessage"></p>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <h1>Admin Panel</h1>
+        <button onclick="logout()" style="float: right;">Logout</button>
+        <div style="clear: both;"></div>
+        
+        <div id="message"></div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('materials')">Raw Materials</div>
+            <div class="tab" onclick="showTab('products')">Products</div>
+        </div>
+        
+        <!-- Raw Materials Section -->
+        <div id="materialsSection" class="section">
+            <h2>Add New Raw Material</h2>
+            <form id="addMaterialForm">
+                <input type="text" id="materialName" placeholder="Material Name" required>
+                <input type="number" id="materialPrice" step="0.01" placeholder="Price" required>
+                <button type="submit">Add Material</button>
+            </form>
+            
+            <h2>Current Raw Materials</h2>
+            <table id="materialsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Current Price</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <!-- Products Section -->
+        <div id="productsSection" class="section hidden">
+            <h2>Add New Product</h2>
+            <form id="addProductForm">
+                <input type="text" id="productName" placeholder="Product Name" required>
+                
+                <select id="productMaterial" required>
+                    <option value="">Select Raw Material</option>
+                </select>
+                
+                <input type="number" id="productBasePrice" step="0.01" placeholder="Base Price" required>
+                
+                <input type="number" id="productCoefficient" step="0.1" placeholder="Coefficient (0-1)" min="0" max="1" value="1.0" required>
+                
+                <select id="productCategory" required>
+                    <option value="">Select Category</option>
+                    <option value="Pipes">Pipes</option>
+                    <option value="Sheets">Sheets</option>
+                    <option value="Bars">Bars</option>
+                    <option value="Wires">Wires</option>
+                    <option value="Coils">Coils</option>
+                    <option value="Plates">Plates</option>
+                    <option value="Tubes">Tubes</option>
+                    <option value="Angles">Angles</option>
+                    <option value="Channels">Channels</option>
+                    <option value="Beams">Beams</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <button type="submit">Add Product</button>
+            </form>
+            
+            <h2>Current Products</h2>
+            <div style="margin-bottom: 10px;">
+                <label>Filter by Category: </label>
+                <select id="filterCategory" onchange="filterProducts()">
+                    <option value="">All Categories</option>
+                    <option value="Pipes">Pipes</option>
+                    <option value="Sheets">Sheets</option>
+                    <option value="Bars">Bars</option>
+                    <option value="Wires">Wires</option>
+                    <option value="Coils">Coils</option>
+                    <option value="Plates">Plates</option>
+                    <option value="Tubes">Tubes</option>
+                    <option value="Angles">Angles</option>
+                    <option value="Channels">Channels</option>
+                    <option value="Beams">Beams</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Raw Material</th>
+                        <th>Base Price</th>
+                        <th>Coefficient</th>
+                        <th>Current Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let isLoggedIn = false;
+        let allProducts = [];
+        let allMaterials = [];
+        
+        window.onload = function() {
+            checkSession();
+        };
+        
+        // Tab switching
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'materials') {
+                document.getElementById('materialsSection').classList.remove('hidden');
+                document.getElementById('productsSection').classList.add('hidden');
+                loadMaterials();
+            } else {
+                document.getElementById('materialsSection').classList.add('hidden');
+                document.getElementById('productsSection').classList.remove('hidden');
+                loadProducts();
+                loadMaterialsDropdown();
+            }
+        }
+        
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    isLoggedIn = true;
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadMaterials();
+                } else {
+                    document.getElementById('loginMessage').textContent = data.error || 'Login failed';
+                    document.getElementById('loginMessage').className = 'error';
+                }
+            } catch (error) {
+                document.getElementById('loginMessage').textContent = 'Error: ' + error.message;
+                document.getElementById('loginMessage').className = 'error';
+            }
+        });
+        
+        async function checkSession() {
+            try {
+                const response = await fetch(`${API_BASE}/raw-materials`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    isLoggedIn = true;
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadMaterials();
+                }
+            } catch (error) {
+                console.log('Not logged in');
+            }
+        }
+        
+        async function logout() {
+            const response = await fetch(`${API_BASE}/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                isLoggedIn = false;
+                document.getElementById('adminPanel').classList.add('hidden');
+                document.getElementById('loginSection').classList.remove('hidden');
+            }
+        }
+        
+        // Load materials for dropdown
+        async function loadMaterialsDropdown() {
+            const response = await fetch(`${API_BASE}/raw-materials`, {
+                credentials: 'include'
+            });
+            allMaterials = await response.json();
+            
+            const select = document.getElementById('productMaterial');
+            select.innerHTML = '<option value="">Select Raw Material</option>';
+            
+            allMaterials.forEach(material => {
+                const option = document.createElement('option');
+                option.value = material.id;
+                option.textContent = `${material.name} - $${material.current_price}`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Load all materials
+        async function loadMaterials() {
+            const response = await fetch(`${API_BASE}/raw-materials`, {
+                credentials: 'include'
+            });
+            const materials = await response.json();
+            
+            const tbody = document.querySelector('#materialsTable tbody');
+            tbody.innerHTML = '';
+            
+            materials.forEach(material => {
+                const row = `
+                    <tr>
+                        <td>${material.id}</td>
+                        <td>${material.name}</td>
+                        <td>
+                            <input type="number" id="price-${material.id}" 
+                                   value="${material.current_price}" step="0.01">
+                        </td>
+                        <td>${new Date(material.last_updated).toLocaleString()}</td>
+                        <td>
+                            <button onclick="updatePrice(${material.id})">Update</button>
+                            <button class="delete" onclick="deleteMaterial(${material.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        // Load all products
+        async function loadProducts() {
+            const response = await fetch(`${API_BASE}/products`, {
+                credentials: 'include'
+            });
+            allProducts = await response.json();
+            displayProducts(allProducts);
+        }
+        
+        function displayProducts(products) {
+            const tbody = document.querySelector('#productsTable tbody');
+            tbody.innerHTML = '';
+            
+            products.forEach(product => {
+                const row = `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category || 'N/A'}</td>
+                        <td>${product.raw_material_name}</td>
+                        <td>$${product.base_price.toFixed(2)}</td>
+                        <td>${product.coefficient}</td>
+                        <td>$${product.current_price.toFixed(2)}</td>
+                        <td>
+                            <button class="delete" onclick="deleteProduct(${product.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        function filterProducts() {
+            const category = document.getElementById('filterCategory').value;
+            if (category === '') {
+                displayProducts(allProducts);
+            } else {
+                const filtered = allProducts.filter(p => p.category === category);
+                displayProducts(filtered);
+            }
+        }
+        
+        // Add new material
+        document.getElementById('addMaterialForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('materialName').value;
+            const price = parseFloat(document.getElementById('materialPrice').value);
+            
+            const response = await fetch(`${API_BASE}/raw-materials`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ name, current_price: price })
+            });
+            
+            if (response.ok) {
+                showMessage('Material added successfully', 'success');
+                loadMaterials();
+                e.target.reset();
+            } else {
+                showMessage('Error adding material', 'error');
+            }
+        });
+        
+        // Add new product
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const product = {
+                name: document.getElementById('productName').value,
+                raw_material_id: parseInt(document.getElementById('productMaterial').value),
+                base_price: parseFloat(document.getElementById('productBasePrice').value),
+                coefficient: parseFloat(document.getElementById('productCoefficient').value),
+                category: document.getElementById('productCategory').value
+            };
+            
+            const response = await fetch(`${API_BASE}/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(product)
+            });
+            
+            if (response.ok) {
+                showMessage('Product added successfully', 'success');
+                loadProducts();
+                e.target.reset();
+            } else {
+                const error = await response.json();
+                showMessage('Error adding product: ' + (error.error || 'Unknown error'), 'error');
+            }
+        });
+        
+        // Update material price
+        async function updatePrice(id) {
+            const newPrice = parseFloat(document.getElementById(`price-${id}`).value);
+            
+            const response = await fetch(`${API_BASE}/raw-materials/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ current_price: newPrice })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showMessage(`Price updated! ${result.updated_products.length} products affected`, 'success');
+                loadMaterials();
+            } else {
+                showMessage('Error updating price', 'error');
+            }
+        }
+        
+        // Delete material
+        async function deleteMaterial(id) {
+            if (!confirm('Are you sure you want to delete this material?')) return;
+            
+            const response = await fetch(`${API_BASE}/raw-materials/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                showMessage('Material deleted', 'success');
+                loadMaterials();
+            } else {
+                showMessage('Error deleting material', 'error');
+            }
+        }
+        
+        // Delete product
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            
+            const response = await fetch(`${API_BASE}/products/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                showMessage('Product deleted', 'success');
+                loadProducts();
+            } else {
+                showMessage('Error deleting product', 'error');
+            }
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = type;
+            setTimeout(() => msg.textContent = '', 3000);
+        }
+    </script>
+</body>
+</html>
